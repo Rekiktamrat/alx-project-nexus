@@ -23,8 +23,8 @@ services:
       - key: FRONTEND_URL
         value: https://job-board-frontend.onrender.com
 
-  - type: static
-    name: job-board-frontend
+staticSites:
+  - name: job-board-frontend
     runtime: static
     buildCommand: "npm install && npm run build"
     publishDir: "dist"
