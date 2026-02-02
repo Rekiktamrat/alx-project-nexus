@@ -7,8 +7,8 @@ services:
   - type: web
     name: job-board-backend
     runtime: python
-    buildCommand: "./job_board/build.sh"
-    startCommand: "cd job_board && gunicorn job_board.wsgi:application"
+    buildCommand: "bash ./job_board/build.sh"
+    startCommand: "gunicorn job_board.wsgi:application"
     envVars:
       - key: PYTHON_VERSION
         value: 3.9.0
@@ -26,6 +26,7 @@ services:
 staticSites:
   - name: job-board-frontend
     runtime: static
+    rootDir: frontend
     buildCommand: "npm install && npm run build"
     publishDir: "dist"
     envVars:
