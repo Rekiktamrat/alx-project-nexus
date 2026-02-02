@@ -1,65 +1,52 @@
-# Deployment Guide: Free Options
+# Deployment Guide: Folder Restructuring Update
 
-You have two main ways to deploy this project for **FREE**.
+We have restructured the project to separate the backend and frontend completely. This makes deployment much easier and cleaner.
 
-## Option 1: Render Blueprint (Easiest)
-We have updated `render.yaml` to explicitly use the **Free Plan**.
+## New Project Structure
+- `backend/`: Contains all Django files (`manage.py`, `requirements.txt`, etc.).
+- `frontend/`: Contains all React files (`package.json`, `vite.config.js`, etc.).
+- `render.yaml`: Defines the blueprint for both services.
 
-1.  **Push** your code to GitHub.
-2.  Go to [Render Dashboard](https://dashboard.render.com/).
-3.  Click **New +** -> **Blueprint**.
-4.  Select your repository.
-5.  **Important:** If Render asks for a credit card, it is for identity verification. They will not charge you if the plan is set to "Free".
-6.  Click **Apply**.
+## Option 1: Render Blueprint (Recommended)
+1.  **Push** the changes to GitHub.
+2.  Go to Render Dashboard -> **New Blueprint**.
+3.  Select your repository.
+4.  Render should detect the new structure and deploy:
+    - `job-board-backend` (Python) from `backend/` directory.
+    - `job-board-frontend` (Static) from `frontend/` directory.
+    - `job-board-db` (Postgres).
 
----
+## Option 2: Manual Deployment (Vercel + Render)
 
-## Option 2: The "Zero Cost" Stack (Vercel + Render Manual)
-If Render Blueprints are giving you trouble or asking for payment upgrades, use this method. It splits the app to get the best free tiers.
+### Frontend (Vercel)
+1.  Import repository to Vercel.
+2.  **Root Directory:** Select `frontend`.
+3.  **Build Command:** `npm run build`.
+4.  **Output Directory:** `dist`.
+5.  **Env Vars:** `VITE_API_URL` = Your Backend URL + `/api`.
 
-### Part A: Database (Render or Neon)
-1.  **Render Postgres (Free for 90 days):**
-    - Go to Render Dashboard -> New + -> **PostgreSQL**.
-    - Name: `job-board-db`.
-    - Plan: **Free**.
-    - Copy the `Internal DB URL` (for Render backend) and `External DB URL` (for local access).
+### Backend (Render)
+1.  Create **Web Service**.
+2.  **Root Directory:** `backend` (Important!).
+3.  **Build Command:** `bash build.sh`.
+4.  **Start Command:** `gunicorn job_board.wsgi:application`.
+5.  **Env Vars:** Same as before (`DATABASE_URL`, `SECRET_KEY`, etc.).
 
-### Part B: Backend (Render)
-1.  Go to Render Dashboard -> New + -> **Web Service**.
-2.  Connect your GitHub repo.
-3.  **Settings:**
-    - **Name:** `job-board-backend`
-    - **Runtime:** Python 3
-    - **Build Command:** `bash build.sh`
-    - **Start Command:** `gunicorn job_board.wsgi:application`
-    - **Plan:** Free
-4.  **Environment Variables:**
-    - `PYTHON_VERSION`: `3.11.0`
-    - `DATABASE_URL`: (Paste the Internal DB URL from Part A)
-    - `SECRET_KEY`: (Any random string)
-    - `ALLOWED_HOSTS`: `*`
-5.  Deploy. Copy your backend URL (e.g., `https://job-board-backend.onrender.com`).
+### Local Development
+To run the project locally now:
 
-### Part C: Frontend (Vercel) - Recommended 👑
-Vercel is the best place for React apps (Free & Fast).
+**Backend:**
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate  # or venv\Scripts\activate on Windows
+pip install -r requirements.txt
+python manage.py runserver
+```
 
-1.  Go to [Vercel Dashboard](https://vercel.com/new).
-2.  Import your GitHub repository.
-3.  **Configure Project:**
-    - **Root Directory:** Edit -> Select `frontend` folder.
-    - **Framework Preset:** Vite (should auto-detect).
-4.  **Environment Variables:**
-    - `VITE_API_URL`: (Paste your Render Backend URL from Part B, e.g., `https://job-board-backend.onrender.com/api`)
-    - **Note:** Make sure to add `/api` at the end!
-5.  Click **Deploy**.
-
-### Final Step: Connect Frontend to Backend
-Once Vercel gives you a domain (e.g., `https://job-board-frontend.vercel.app`):
-1.  Go back to **Render Dashboard** -> **Backend Service** -> **Environment Variables**.
-2.  Add/Update:
-    - `FRONTEND_URL`: `https://job-board-frontend.vercel.app`
-    - `CORS_ALLOWED_ORIGINS`: `https://job-board-frontend.vercel.app`
-    - `CSRF_TRUSTED_ORIGINS`: `https://job-board-frontend.vercel.app`
-3.  Save Changes (Render will restart).
-
-**Done!** You now have a free full-stack app.
+**Frontend:**
+```bash
+cd frontend
+npm install
+npm run dev
+```
