@@ -2,12 +2,14 @@ databases:
   - name: job-board-db
     databaseName: job_board
     user: job_board_user
+    plan: free # Explicitly set to free plan
 
 services:
   # Backend Service
   - type: web
     name: job-board-backend
     runtime: python
+    plan: free # Explicitly set to free plan
     buildCommand: "bash build.sh"
     startCommand: "gunicorn job_board.wsgi:application"
     envVars:
@@ -28,6 +30,7 @@ services:
   - type: web
     name: job-board-frontend
     runtime: static
+    plan: free # Explicitly set to free plan
     rootDir: frontend
     buildCommand: "npm install && npm run build"
     staticPublishPath: "./dist"
