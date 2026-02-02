@@ -4,6 +4,7 @@ databases:
     user: job_board_user
 
 services:
+  # Backend Service
   - type: web
     name: job-board-backend
     runtime: python
@@ -23,12 +24,13 @@ services:
       - key: FRONTEND_URL
         value: https://job-board-frontend.onrender.com
 
-staticSites:
-  - name: job-board-frontend
+  # Frontend Static Site
+  - type: web
+    name: job-board-frontend
     runtime: static
     rootDir: frontend
     buildCommand: "npm install && npm run build"
-    publishDir: "dist"
+    staticPublishPath: "./dist"
     envVars:
       - key: VITE_API_URL
         value: https://job-board-backend.onrender.com/api
