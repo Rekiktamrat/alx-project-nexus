@@ -1,70 +1,62 @@
-# Deployment Guide for Render
+# Manual Deployment Guide for Render
 
-This guide will help you deploy your Job Board Platform (Django Backend + React Frontend) to Render.
+Since the automatic blueprint was causing issues, we will deploy the services manually. This is often more reliable and gives you more control.
 
-## Prerequisites
+## Step 1: Push Code to GitHub
+Ensure your latest code (including the updated `requirements.txt`) is pushed to your GitHub repository.
 
-1.  A [GitHub](https://github.com/) account.
-2.  A [Render](https://render.com/) account.
-3.  Your code pushed to a GitHub repository.
+## Step 2: Create the Database (PostgreSQL)
+1. Log in to [Render Dashboard](https://dashboard.render.com/).
+2. Click **New +** -> **PostgreSQL**.
+3. **Name**: `job-board-db`
+4. **Region**: Frankfurt (or closest to you).
+5. **PostgreSQL Version**: 16 (default).
+6. Click **Create Database**.
+7. **Important**: Once created, scroll down to the **Connections** section and copy the **Internal Database URL**. You will need this for the backend.
 
-## Option 1: Automatic Deployment (Recommended)
+## Step 3: Deploy the Backend (Django)
+1. Click **New +** -> **Web Service**.
+2. Select **Build and deploy from a Git repository**.
+3. Connect your `Job Board Platform` repository.
+4. **Name**: `job-board-backend`
+5. **Region**: Same as your database (e.g., Frankfurt).
+6. **Runtime**: Python 3
+7. **Build Command**: `./build.sh`
+8. **Start Command**: `gunicorn job_board.wsgi:application`
+9. **Root Directory**: `job_board`  <-- **CRITICAL STEP**
+   * *This tells Render to run everything from inside the `job_board` folder.*
+10. **Environment Variables** (Click "Add Environment Variable"):
+    * `DATABASE_URL`: Paste the **Internal Database URL** you copied earlier.
+    * `SECRET_KEY`: Enter a random long string (e.g., `django-insecure-random-string-123`).
+    * `PYTHON_VERSION`: `3.9.0`
+    * `FRONTEND_URL`: `https://job-board-frontend.onrender.com` (You can update this later if you don't know it yet).
+11. Click **Create Web Service**.
 
-1.  **Push your code to GitHub.**
-2.  **Log in to Render.**
-3.  **Click "New" -> "Blueprint".**
-4.  **Connect your GitHub repository.**
-5.  Render will automatically detect the `render.yaml` file and set up:
-    *   A PostgreSQL Database.
-    *   The Django Backend Web Service.
-    *   The React Frontend Static Site.
-6.  **Click "Apply".**
+## Step 4: Deploy the Frontend (React)
+1. Click **New +** -> **Static Site**.
+2. Connect your `Job Board Platform` repository.
+3. **Name**: `job-board-frontend`
+4. **Root Directory**: `frontend` <-- **CRITICAL STEP**
+5. **Build Command**: `npm install && npm run build`
+6. **Publish Directory**: `dist`
+7. **Environment Variables**:
+    * `VITE_API_URL`: Paste your Backend URL (e.g., `https://job-board-backend.onrender.com/api`).
+      * *Note: You get the Backend URL from the service you created in Step 3.*
+8. Click **Create Static Site**.
+9. **Redirects/Rewrites**:
+    * Go to the **Redirects/Rewrites** tab of your new Static Site.
+    * Add a new rule:
+        * **Source**: `/*`
+        * **Destination**: `/index.html`
+        * **Action**: `Rewrite`
+    * Click **Save Changes**.
 
-**Note:** You might need to update the `FRONTEND_URL` and `VITE_API_URL` environment variables after the services are created if the auto-generated URLs differ from the defaults in `render.yaml`.
-
-## Option 2: Manual Deployment
-
-### 1. Database (PostgreSQL)
-1.  Click **New +** -> **PostgreSQL**.
-2.  Name: `job-board-db`.
-3.  Click **Create Database**.
-4.  Copy the **Internal Database URL**.
-
-### 2. Backend (Django)
-1.  Click **New +** -> **Web Service**.
-2.  Connect your repo.
-3.  Name: `job-board-backend`.
-4.  Runtime: **Python 3**.
-5.  Build Command: `./job_board/build.sh`
-6.  Start Command: `cd job_board && gunicorn job_board.wsgi:application`
-7.  **Environment Variables:**
-    *   `DATABASE_URL`: Paste the Internal Database URL from step 1.
-    *   `SECRET_KEY`: Generate a random string.
-    *   `PYTHON_VERSION`: `3.9.0` (or your preferred version).
-    *   `FRONTEND_URL`: (Leave empty for now, update after deploying frontend).
-8.  Click **Create Web Service**.
-
-### 3. Frontend (React)
-1.  Click **New +** -> **Static Site**.
-2.  Connect your repo.
-3.  Name: `job-board-frontend`.
-4.  Build Command: `cd frontend && npm install && npm run build`
-5.  Publish Directory: `frontend/dist`
-6.  **Environment Variables:**
-    *   `VITE_API_URL`: Paste the URL of your backend service (e.g., `https://job-board-backend.onrender.com/api`).
-7.  Click **Create Static Site**.
-8.  **Rewrites:**
-    *   Go to "Redirects/Rewrites" tab.
-    *   Add a Rewrite: Source `/*`, Destination `/index.html`.
-
-### 4. Final Configuration
-1.  Copy the URL of your deployed Frontend (e.g., `https://job-board-frontend.onrender.com`).
-2.  Go back to your **Backend Service** -> **Environment**.
-3.  Add/Update `FRONTEND_URL` with your frontend URL.
-4.  Redeploy the backend if necessary.
+## Step 5: Final Connection
+1. Once the Frontend is deployed, copy its URL (e.g., `https://job-board-frontend.onrender.com`).
+2. Go back to your **Backend Service** -> **Environment**.
+3. Update/Add the `FRONTEND_URL` variable with this URL.
+4. The Backend might auto-deploy when you save. If not, click **Manual Deploy** -> **Deploy latest commit**.
 
 ## Troubleshooting
-
-*   **Build Failures:** Check the logs. Ensure `requirements.txt` and `package.json` are in the correct locations.
-*   **Database Connection:** Ensure `DATABASE_URL` is correct and the database service is running.
-*   **CORS Errors:** Ensure `FRONTEND_URL` in backend env vars matches your actual frontend URL (no trailing slash).
+* **Backend Build Fails?** Check logs. If it says "requirements.txt not found", ensure "Root Directory" is set to `job_board`.
+* **Frontend Blank Page?** Ensure the "Rewrite" rule is set correctly in Step 4.
