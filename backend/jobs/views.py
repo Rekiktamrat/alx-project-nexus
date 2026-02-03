@@ -24,6 +24,7 @@ class JobViewSet(viewsets.ModelViewSet):
         location = self.request.query_params.get('location')
         job_type = self.request.query_params.get('type')
         experience_level = self.request.query_params.get('level')
+        search_query = self.request.query_params.get('search')
 
         if category:
             queryset = queryset.filter(category__name__iexact=category)
@@ -33,6 +34,13 @@ class JobViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(job_type=job_type)
         if experience_level:
             queryset = queryset.filter(experience_level=experience_level)
+        if search_query:
+            from django.db.models import Q
+            queryset = queryset.filter(
+                Q(title__icontains=search_query) | 
+                Q(company__icontains=search_query) |
+                Q(description__icontains=search_query)
+            )
         
         return queryset
 

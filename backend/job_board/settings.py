@@ -170,10 +170,19 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Trust the Render domains for CSRF
 CSRF_TRUSTED_ORIGINS = [
     "https://alx-project-nexus-4-a85t.onrender.com",
-    "https://job-board-kmda.onrender.com" # Add your frontend URL here too
+    "https://job-board-kmda.onrender.com",
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:5174",
 ]
 
-# Ensure cookies are sent securely over HTTPS
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
+# Ensure cookies are sent securely over HTTPS only in production
+if 'RENDER' in os.environ or 'RAILWAY_ENVIRONMENT' in os.environ:
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
+else:
+    CSRF_COOKIE_SECURE = False
+    SESSION_COOKIE_SECURE = False
+
 CSRF_COOKIE_HTTPONLY = True
