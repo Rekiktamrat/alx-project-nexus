@@ -163,3 +163,17 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+
+# settings.py
+
+# Trust the Render domains for CSRF
+CSRF_TRUSTED_ORIGINS = [
+    "https://alx-project-nexus-4-a85t.onrender.com",
+    "https://job-board-kmda.onrender.com" # Add your frontend URL here too
+]
+
+# Ensure cookies are sent securely over HTTPS
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_HTTPONLY = True
