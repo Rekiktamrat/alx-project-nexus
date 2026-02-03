@@ -7,6 +7,14 @@ django.setup()
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
+from jobs.models import Category
+
+# Ensure categories exist
+categories = ['Technology', 'Healthcare', 'Finance', 'Education', 'Marketing', 'Design', 'Sales', 'Engineering']
+for cat_name in categories:
+    Category.objects.get_or_create(name=cat_name)
+print(f"Verified {len(categories)} categories.")
+
 if not User.objects.filter(username='admin').exists():
     User.objects.create_superuser('admin', 'admin@example.com', 'admin', role='admin')
     print("Superuser 'admin' created with role='admin'.")
