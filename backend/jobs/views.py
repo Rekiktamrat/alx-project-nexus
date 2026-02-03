@@ -13,13 +13,18 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class JobViewSet(viewsets.ModelViewSet):
     queryset = Job.objects.all()
     serializer_class = JobSerializer
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):
         serializer.save(posted_by=self.request.user)
 
     def get_queryset(self):
         queryset = Job.objects.all()
+
+        # Only show approved jobs to non-admins
+        if not (self.request.user.is_authenticated and getattr(self.request.user, 'role', '') == 'admin'):
+            queryset = queryset.filter(is_approved=True)
+
         category = self.request.query_params.get('category')
         location = self.request.query_params.get('location')
         job_type = self.request.query_params.get('type')
@@ -58,6 +63,13 @@ class JobViewSet(viewsets.ModelViewSet):
             serializer.save(job=job, applicant=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
+    def approve(self, request, pk=None):
+        job = self.get_object()
+        job.is_approved = True
+        job.save()
+        return Response({'status': 'job approved'})
 
 class ApplicationViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ApplicationSerializer

@@ -17,12 +17,13 @@ const CreateJobPage = () => {
         description: ''
     });
     const [error, setError] = useState('');
+    const [success, setSuccess] = useState(false);
 
-    if (!user || user.role !== 'admin') {
+    if (!user) {
         return (
             <div className="container mx-auto px-4 py-8 text-center">
                 <h2 className="text-2xl font-bold text-red-600">Access Denied</h2>
-                <p className="mt-2">You must be an admin to post jobs.</p>
+                <p className="mt-2">You must be logged in to post jobs.</p>
             </div>
         );
     }
@@ -37,11 +38,30 @@ const CreateJobPage = () => {
 
         const result = await createJob(formData);
         if (result.success) {
-            navigate('/');
+            setSuccess(true);
         } else {
             setError(result.message);
         }
     };
+
+    if (success) {
+        return (
+            <div className="container mx-auto px-4 py-8 text-center">
+                <div className="max-w-2xl mx-auto bg-green-50 p-8 rounded-lg shadow-md border border-green-200">
+                    <h2 className="text-3xl font-bold text-green-700 mb-4">Success!</h2>
+                    <p className="text-lg text-green-800 mb-6">
+                        Your job has been submitted and is pending admin approval.
+                    </p>
+                    <button
+                        onClick={() => navigate('/')}
+                        className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition duration-200"
+                    >
+                        Back to Home
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="container mx-auto px-4 py-8">
@@ -87,6 +107,31 @@ const CreateJobPage = () => {
                                 value={formData.location}
                                 onChange={handleChange}
                                 required
+                                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-gray-700 font-medium mb-2">Min Salary ($)</label>
+                            <input
+                                type="number"
+                                name="salary_min"
+                                value={formData.salary_min || ''}
+                                onChange={handleChange}
+                                placeholder="e.g. 50000"
+                                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-gray-700 font-medium mb-2">Max Salary ($)</label>
+                            <input
+                                type="number"
+                                name="salary_max"
+                                value={formData.salary_max || ''}
+                                onChange={handleChange}
+                                placeholder="e.g. 80000"
                                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                         </div>

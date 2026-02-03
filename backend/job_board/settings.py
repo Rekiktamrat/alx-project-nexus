@@ -44,6 +44,7 @@ if 'RAILWAY_ENVIRONMENT' in os.environ:
 # Application definition
 
 INSTALLED_APPS = [
+    'unfold',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -59,6 +60,12 @@ INSTALLED_APPS = [
     'users',
     'jobs',
 ]
+
+UNFOLD = {
+    "DASHBOARD_CALLBACK": "jobs.dashboard.dashboard_callback",
+    "SITE_TITLE": "Job Board Admin",
+    "SITE_HEADER": "Job Board Dashboard",
+}
 
 AUTH_USER_MODEL = 'users.User'
 

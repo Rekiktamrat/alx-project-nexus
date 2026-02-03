@@ -30,6 +30,7 @@ export const jobsAPI = {
     update: (id, jobData) => api.put(`/jobs/${id}/`, jobData),
     delete: (id) => api.delete(`/jobs/${id}/`),
     apply: (id, data) => api.post(`/jobs/${id}/apply/`, data),
+    approve: (id) => api.post(`/jobs/${id}/approve/`),
 };
 
 export const applicationsAPI = {

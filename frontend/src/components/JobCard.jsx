@@ -52,7 +52,10 @@ const JobCard = ({ job }) => {
                             <FiClock /> {timeAgo(job.created_at)}
                         </div>
                         <div className="flex items-center gap-1">
-                            <FiDollarSign /> $60k - $120k {/* Mock salary if not in DB */}
+                            <FiDollarSign />
+                            {job.salary_min && job.salary_max
+                                ? `$${job.salary_min.toLocaleString()} - $${job.salary_max.toLocaleString()}`
+                                : 'Salary not specified'}
                         </div>
                     </div>
 

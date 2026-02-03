@@ -37,14 +37,12 @@ const Navbar = () => {
                             >
                                 Sign Out
                             </button>
-                            {user.role === 'admin' && (
-                                <Link 
-                                    to="/jobs/create" 
-                                    className="bg-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold hover:bg-blue-700 transition-all shadow-sm hover:shadow-md"
-                                >
-                                    Post a Job
-                                </Link>
-                            )}
+                            <Link 
+                                to="/jobs/create" 
+                                className="bg-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold hover:bg-blue-700 transition-all shadow-sm hover:shadow-md"
+                            >
+                                Post a Job
+                            </Link>
                         </div>
                     ) : (
                         <div className="flex items-center gap-4">

@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, useContext } from 'react';
-import { jobsAPI, categoriesAPI } from '../services/api';
+import { jobsAPI, categoriesAPI, applicationsAPI } from '../services/api';
 
 const JobContext = createContext();
 
@@ -61,6 +61,16 @@ export const JobProvider = ({ children }) => {
         }
     };
 
+    const approveJob = async (id) => {
+        try {
+            await jobsAPI.approve(id);
+            await fetchJobs();
+            return { success: true };
+        } catch (err) {
+            return { success: false, message: err.response?.data?.detail || "Failed to approve job" };
+        }
+    };
+
     const fetchApplications = async () => {
         try {
             const response = await applicationsAPI.getAll();
@@ -85,7 +95,8 @@ export const JobProvider = ({ children }) => {
             fetchJobs, 
             applyForJob, 
             createJob, 
-            deleteJob, 
+            deleteJob,
+            approveJob, 
             fetchApplications 
         }}>
             {children}

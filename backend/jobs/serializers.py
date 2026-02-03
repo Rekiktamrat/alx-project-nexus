@@ -13,7 +13,7 @@ class JobSerializer(serializers.ModelSerializer):
     class Meta:
         model = Job
         fields = '__all__'
-        read_only_fields = ('posted_by',)
+        read_only_fields = ('posted_by', 'is_approved')
 
 class ApplicationSerializer(serializers.ModelSerializer):
     job_title = serializers.ReadOnlyField(source='job.title')
