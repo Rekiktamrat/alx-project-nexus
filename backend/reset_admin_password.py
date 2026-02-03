@@ -1,3 +1,4 @@
+
 import os
 import django
 
@@ -7,8 +8,11 @@ django.setup()
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
-if not User.objects.filter(username='admin').exists():
+try:
+    u = User.objects.get(username='admin')
+    u.set_password('admin')
+    u.save()
+    print("Password for 'admin' set to 'admin'.")
+except User.DoesNotExist:
     User.objects.create_superuser('admin', 'admin@example.com', 'admin')
-    print("Superuser 'admin' created.")
-else:
-    print("Superuser 'admin' already exists.")
+    print("Superuser 'admin' created with password 'admin'.")

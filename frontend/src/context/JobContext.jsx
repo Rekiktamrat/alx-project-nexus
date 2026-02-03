@@ -77,7 +77,17 @@ export const JobProvider = ({ children }) => {
     }, []);
 
     return (
-        <JobContext.Provider value={{ jobs, categories, loading, error, fetchJobs, applyForJob, createJob }}>
+        <JobContext.Provider value={{ 
+            jobs, 
+            categories, 
+            loading, 
+            error, 
+            fetchJobs, 
+            applyForJob, 
+            createJob, 
+            deleteJob, 
+            fetchApplications 
+        }}>
             {children}
         </JobContext.Provider>
     );
